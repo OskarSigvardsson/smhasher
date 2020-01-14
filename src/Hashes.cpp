@@ -153,3 +153,29 @@ void Crap8_test ( const void * key, int len, uint32_t seed, void * out )
 {
   *(uint32_t*)out = Crap8((const uint8_t*)key,len,seed);
 }
+
+void gkHash ( const void * key, int len, uint32_t seed, void * out ) 
+{
+	#define FIB1 0x9E3779B97F4A7C16
+	#define FIB2 0x1BB32095CCDD51E4
+
+	#define GK_HASH(a, b) ((a)*FIB1 + (b)*FIB2)
+
+	const uint64_t *vals = (const uint64_t*)key;
+	
+	uint64_t *res = (uint64_t*)out;
+
+	for (int i = 0; i < len/8; i++) {
+		*res = GK_HASH(*res, vals[i]);
+	}
+
+	switch (len & 7) {
+		case 7: *res = GK_HASH(*res, ((uint8_t*)key)[len - 7]); 
+		case 6: *res = GK_HASH(*res, ((uint8_t*)key)[len - 6]); 
+		case 5: *res = GK_HASH(*res, ((uint8_t*)key)[len - 5]); 
+		case 4: *res = GK_HASH(*res, ((uint8_t*)key)[len - 4]); 
+		case 3: *res = GK_HASH(*res, ((uint8_t*)key)[len - 3]); 
+		case 2: *res = GK_HASH(*res, ((uint8_t*)key)[len - 2]); 
+		case 1: *res = GK_HASH(*res, ((uint8_t*)key)[len - 1]); 
+	}
+}
